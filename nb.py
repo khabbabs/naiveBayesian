@@ -5,21 +5,21 @@ __author__ = 'khabbabs'
 
 # files are parsed in the order to vocabulary train.label train.data
 
-vocab = dict()
-trainLabel = dict()
+vocab = []
+trainLabel = []
 trainData = []
 def fileInput():
 
-
+    
     # parsing vocabulary.txt
     with open(sys.argv[1]) as f:
         for index, line in enumerate(f):
-            vocab.__setitem__(index,line.replace('\n',''))
+            vocab.append(line.strip())
 
 
     with open(sys.argv[2]) as f:
         for index, line in enumerate(f):
-            trainLabel.__setitem__(index,line.replace('\n',''))
+            trainLabel.append(line.strip())
 
 
 
@@ -31,11 +31,35 @@ def fileInput():
             newline = line.split(' ')
             trainData.append(newline)
 
+# =====================MAP SECTION===================================
+        # goes through train.data
+        # calculates how many times
+        # a word appears in all docs
+        vocabLen = len(vocab)
+        sparseMatrix = [[0 for i in range(vocabLen+1) ] for j in range(20)]
+        totalWordCount = [0]*(len(vocab)+1)
+        # print type(sparseMatrix[0][1])
+        for index,line in enumerate(trainData):
+            line.append(str(trainLabel[int(line[0])-1]))
+            totalWordCount[int(line[1])]+=int(line[2])
+            sparseMatrix[int(totalWordCount[3])][int(totalWordCount[1])]+=int(totalWordCount[2])
 
 
 
-        for index,line in enumerate(vocab):
-            print(sum([int(x[2]) for x in trainData if x[1] == str(index) ]))
+
+
+        # print(vocab)
+        # print(trainLabel)
+
+
+
+
+
+
+# ==================================================================
+
+
+
 
         # print(trainData)
         # totalWordCount = [0]*(len(vocab)+1)
