@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 import time
+import math
 __author__ = 'khabbabs'
 
 # files are parsed in the order to vocabulary train.label train.data test.label test.data
@@ -71,7 +72,8 @@ def fileInput():
             mapMatrix[int(line[3])-1][int(line[1])-1]+=int(line[2])
 
 
-        totalWordsInEachClass = [sum(mapMatrix[x]) for x in range(20)]
+        # totalWordsInEachClass = [sum(mapMatrix[x]) for x in range(20)]
+        totalWordsInEachClass = [len([i for i in mapMatrix[x] if i != 0]) for x in range(20)]
 
 
 
@@ -83,7 +85,7 @@ def fileInput():
 
                 top = mapMatrix[c][index] + alpha
                 bot = totalWordsInEachClass[c] + (alpha * vocabLen)
-                probXGivenY[c,index] = top / bot
+                probXGivenY[c,index] = float(top) / float(bot)
 
         print "LIL ELEPHANT PEW PEW PEW"
 #####################################################################
@@ -106,6 +108,45 @@ def fileInput():
 
         print "traning Complete: "+str((tend - tstart))
 
+
+        print "Test start"
+
+        tempArray = []
+        docCheck = int(testData[0][0])
+        classArray = []
+        checkClass = []
+
+        for elemment in testData:
+
+            if int(elemment[0]) == docCheck:
+                tempArray.append(elemment[1:])
+
+            else:
+                # print(tempArray)
+                for sub in range(20):
+                    classLog = math.log(probClass[sub])
+                    countWord = sum([ (float(i[1])) * (math.log(probXGivenY[sub,int(i[0])])) for i in tempArray])
+                    classArray.append(classLog+countWord)
+
+
+                # print "old: "+str(docCheck)+" new :"+elemment[0]
+                # print classArray
+                checkClass.append(classArray.index(min(v for v in classArray))+1)
+                docCheck = int(elemment[0])
+                tempArray = []
+                classArray= []
+
+
+        print(len(checkClass))
+        print len([i for i in range(len(checkClass)) if int(checkClass[i])==int(testLabel[i])])
+
+
+
+
+
+
+
+        print "Test End"
 
         # print(trainData)
         # totalWordCount = [0]*(len(vocab)+1)
