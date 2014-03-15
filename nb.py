@@ -1,27 +1,34 @@
 import sys
 import numpy as np
-
+import time
 __author__ = 'khabbabs'
 
-# files are parsed in the order to vocabulary train.label train.data
+# files are parsed in the order to vocabulary train.label train.data test.label test.data
 
 vocab = []
 trainLabel = []
 trainData = []
 mapMatrix = np.zeros((20,61188))
-alpha = 0.0
+probXGivenY = np.zeros((20,61188))
+
+
+testLabel = []
+testData = []
+
 def fileInput():
 
-    
+    print "stated parsing"
     # parsing vocabulary.txt
     with open(sys.argv[1]) as f:
         for index, line in enumerate(f):
             vocab.append(line.strip())
 
+    totalEachClass = [0] * 20
 
     with open(sys.argv[2]) as f:
         for index, line in enumerate(f):
             trainLabel.append(line.strip())
+            totalEachClass[int(line)-1]+=1
 
 
 
@@ -33,12 +40,29 @@ def fileInput():
             newline = line.split(' ')
             trainData.append(newline)
 
+    with open(sys.argv[4]) as f:
+        for index, line in enumerate(f):
+            testLabel.append(line.strip())
+
+    with open(sys.argv[5]) as f:
+        for line in f:
+            line = line.strip()
+            newline = line.split(' ')
+            testData.append(newline)
+
+
+        print "ended parsing"
+
+
+
 # =====================MAP SECTION===================================
         # goes through train.data
         # calculates how many times
         # a word appears in all docs
-        alpha = 1 / float(len(vocab))
-        print alpha
+        tstart = time.time()
+        vocabLen = float(len(vocab))
+        alpha = 1 / vocabLen
+        dirichlet = 1.0 + alpha
         totalWordCount = [0]*(len(vocab)+1)
         # print type(sparseMatrix[0][1])
         for index,line in enumerate(trainData):
@@ -46,9 +70,41 @@ def fileInput():
             totalWordCount[int(line[1])]+=int(line[2])
             mapMatrix[int(line[3])-1][int(line[1])-1]+=int(line[2])
 
-# ==================================================================
+
+        totalWordsInEachClass = [sum(mapMatrix[x]) for x in range(20)]
 
 
+
+# ======================= calculating prob(X | Y) ==================
+        print "START YOUR ENGINES"
+
+        for c in range(20):
+            for index,word in enumerate(vocab):
+
+                top = mapMatrix[c][index] + alpha
+                bot = totalWordsInEachClass[c] + (alpha * vocabLen)
+                probXGivenY[c,index] = top / bot
+
+        print "LIL ELEPHANT PEW PEW PEW"
+#####################################################################
+
+
+# ===================== MLE ========================================
+        totalDocs = float(len(trainLabel))
+        probClass = [ i/totalDocs for i in totalEachClass]
+
+# ===================================================================
+
+
+
+
+
+
+
+
+        tend = time.time()
+
+        print "traning Complete: "+str((tend - tstart))
 
 
         # print(trainData)
