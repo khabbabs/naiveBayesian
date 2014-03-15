@@ -128,7 +128,6 @@ def fileInput():
                     countWord = sum([ (float(i[1])) * (math.log(probXGivenY[sub,int(i[0])-1])) for i in tempArray])
                     classArray.append(classLog+countWord)
 
-
                 # print "old: "+str(docCheck)+" new :"+elemment[0]
                 # print classArray
                 checkClass.append(classArray.index(max(v for v in classArray))+1)
