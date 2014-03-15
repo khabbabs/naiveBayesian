@@ -1,5 +1,5 @@
 import sys
-
+import numpy as np
 
 __author__ = 'khabbabs'
 
@@ -8,6 +8,8 @@ __author__ = 'khabbabs'
 vocab = []
 trainLabel = []
 trainData = []
+mapMatrix = np.zeros((20,61188))
+alpha = 0.0
 def fileInput():
 
     
@@ -35,26 +37,14 @@ def fileInput():
         # goes through train.data
         # calculates how many times
         # a word appears in all docs
-        vocabLen = len(vocab)
-        sparseMatrix = [[0 for i in range(vocabLen+1) ] for j in range(20)]
+        alpha = 1 / float(len(vocab))
+        print alpha
         totalWordCount = [0]*(len(vocab)+1)
         # print type(sparseMatrix[0][1])
         for index,line in enumerate(trainData):
             line.append(str(trainLabel[int(line[0])-1]))
             totalWordCount[int(line[1])]+=int(line[2])
-            sparseMatrix[int(totalWordCount[3])][int(totalWordCount[1])]+=int(totalWordCount[2])
-
-
-
-
-
-        # print(vocab)
-        # print(trainLabel)
-
-
-
-
-
+            mapMatrix[int(line[3])-1][int(line[1])-1]+=int(line[2])
 
 # ==================================================================
 
